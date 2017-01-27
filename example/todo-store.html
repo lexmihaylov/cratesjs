@@ -1,0 +1,27 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../crates.include.html">
+
+<dom-module id="todo-store">
+    <script>
+        (function() {
+            'use strict';
+
+            var TodoStoreBehavior = Polymer.Crates.createBehavior({
+                todos: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                }
+            });
+
+            Polymer({
+                is: "todo-store",
+
+                behaviors: [
+                    TodoStoreBehavior
+                ]
+            });
+        }());
+    </script>
+</dom-module>

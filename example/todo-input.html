@@ -1,0 +1,31 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="./todo-store.html">
+<dom-module id="todo-input">
+    <template>
+        <style>
+            :host {
+                display: inline-block;
+            }
+        </style>
+
+        <input type="text" on-change="addTodo">
+
+        <todo-store id="todoStore" todos="{{todos}}"></todo-store>
+    </template>
+
+    <script>
+        Polymer({
+            is: "todo-input",
+            properties: {
+                todos: Array
+            },
+
+            addTodo: function(e) {
+                this.push('todos', e.target.value);
+                this.$.todoStore.setStoreValue('todos', this.todos);
+                e.target.value = '';
+            },
+
+        });
+    </script>
+</dom-module>

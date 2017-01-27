@@ -1,0 +1,44 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="./todo-store.html">
+<dom-module id="todo-list">
+    <template>
+        <style>
+            :host {
+                display: inline-block;
+            }
+        </style>
+        <table>
+            <template is="dom-repeat" items="[[todos]]">
+                <tr>
+                    <td>
+                        [[item]]
+                    </td>
+                    <td>
+                        <button on-tap="deleteItem" id="[[index]]">X</button>
+                    </td>
+                </tr>
+            </template>
+        </table>
+
+        <todo-store id="todoStore" todos="{{todos}}"></todo-store>
+    </template>
+
+    <script>
+        Polymer({
+            is: "todo-list",
+            properties: {
+                todos: Array
+            },
+
+            deleteItem: function(e) {
+                var button = e.target;
+                var index = parseInt(button.id);
+                this.splice('todos', index, 1);
+                var todos = this.todos;
+
+                this.notifyPath('todos', []);
+                this.notifyPath('todos', todos);
+            }
+        });
+    </script>
+</dom-module>
