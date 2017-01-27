@@ -1,8 +1,7 @@
 
 /**
  *
- * @author Alexander Mihaylov <lex.mihaylov@gmail.com>
- * @module Crates
+ * @module cratesjs
  * @license MIT
  *
  * CratesJS is a shared store libriary that has the capabilities of creating
@@ -10,6 +9,123 @@
  * the store elements and the elements that he is used in. This library is a way
  * to efficiently communicate between different parts of the application without
  * using untracable pub-sub signals.
+ *
+ * @example
+ * ### Creating a store component
+ * ```html
+ * <link rel="import" href="../../polymer/polymer.html">
+ * <link rel="import" href="../crates.include.html">
+ *
+ * <dom-module id="todo-store">
+ *     <script>
+ *         (function() {
+ *             'use strict';
+ *
+ *             var TodoStoreBehavior = Polymer.Crates.createBehavior({
+ *                 todos: {
+ *                     type: Array,
+ *                     value: function() {
+ *                         return [];
+ *                     }
+ *                 }
+ *             });
+ *
+ *             Polymer({
+ *                 is: "todo-store",
+ *
+ *                 behaviors: [
+ *                     TodoStoreBehavior
+ *                 ]
+ *             });
+ *         }());
+ *     </script>
+ * </dom-module>
+ * ```
+ *
+ * ### Using the store component in other custom elements
+ * #### TODO input
+ * ```html
+ * <link rel="import" href="../../polymer/polymer.html">
+ * <link rel="import" href="./todo-store.html">
+ * <dom-module id="todo-input">
+ *     <template>
+ *         <style>
+ *             :host {
+ *                 display: inline-block;
+ *             }
+ *         </style>
+ *
+ *         <input type="text" on-change="addTodo">
+ *
+ *         <todo-store id="todoStore" todos="{{todos}}"></todo-store>
+ *     </template>
+ *
+ *     <script>
+ *         Polymer({
+ *             is: "todo-input",
+ *             properties: {
+ *                 todos: Array
+ *             },
+ *
+ *             addTodo: function(e) {
+ *                 this.push('todos', e.target.value);
+ *                 this.$.todoStore.setStoreValue('todos', this.todos);
+ *                 e.target.value = '';
+ *             },
+ *
+ *         });
+ *     </script>
+ * </dom-module>
+ * ```
+ *
+ * #### TODO list
+ * ```html
+ * <link rel="import" href="../../polymer/polymer.html">
+ * <link rel="import" href="./todo-store.html">
+ * <dom-module id="todo-list">
+ *     <template>
+ *         <style>
+ *             :host {
+ *                 display: inline-block;
+ *             }
+ *         </style>
+ *         <table>
+ *             <template is="dom-repeat" items="[[todos]]">
+ *                 <tr>
+ *                     <td>
+ *                         [[item]]
+ *                     </td>
+ *                     <td>
+ *                         <button on-tap="deleteItem" id="[[index]]">X</button>
+ *                     </td>
+ *                 </tr>
+ *             </template>
+ *         </table>
+ *
+ *         <todo-store id="todoStore" todos="{{todos}}"></todo-store>
+ *     </template>
+ *
+ *     <script>
+ *         Polymer({
+ *             is: "todo-list",
+ *             properties: {
+ *                 todos: Array
+ *             },
+ *
+ *             deleteItem: function(e) {
+ *                 var button = e.target;
+ *                 var index = parseInt(button.id);
+ *                 this.splice('todos', index, 1);
+ *                 var todos = this.todos;
+ *
+ *                 this.notifyPath('todos', []);
+ *                 this.notifyPath('todos', todos);
+ *             }
+ *         });
+ *     </script>
+ * </dom-module>
+ *
+ * ```
  */
 (function(root, namespace, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -86,7 +202,7 @@
          * listening for a change
          * @param {String} path
          * @param {Mixed} value
-         * @param {[Boolean=true]} notify
+         * @param {Boolean} [notify=true]
          */
         Crate.prototype.set = function(path, value, notify) {
             if(notify === undefined || notify === null) {
