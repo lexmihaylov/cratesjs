@@ -1,7 +1,7 @@
 
 /**
- *
- * @module cratesjs
+ * @namespace Crates
+ * @global
  * @license MIT
  *
  * CratesJS is a shared store libriary that has the capabilities of creating
@@ -186,12 +186,13 @@
          * @property {Function} handler
          */
 
-        /**
-         * Creates a store that can be used to share information between different
-         * components via events
-         * @constructor
-         * @param {Object} payload
-         */
+         /**
+          * Creates a store that can be used to share information between different
+          * components via events
+          * @memberof Crates
+          * @class
+          * @param {Object} payload
+          */
         var Crate = function(payload) {
             this._payload = payload;
             this._observers = {};
@@ -200,6 +201,7 @@
         /**
          * set a store property and disptch an event to all the observers
          * listening for a change
+         * @memberof Crates
          * @param {String} path
          * @param {Mixed} value
          * @param {Boolean} [notify=true]
@@ -222,6 +224,7 @@
 
         /**
          * get a property value from the store
+         * @memberof Crates
          * @param  {String} path
          * @return {mixed}
          */
@@ -231,6 +234,7 @@
 
         /**
          * creates new complex values (Object, Array)
+         * @memberof Crates
          * @param  {mixed} value
          * @return {mixed}
          */
@@ -246,6 +250,7 @@
 
         /**
          * call all observers listenting for a property
+         * @memberof Crates
          * @param  {String} path
          * @param  {Mixed} value
          */
@@ -265,6 +270,7 @@
 
         /**
          * add an observer for a specific property
+         * @memberof Crates
          * @param {String} path
          * @param {Function} handler
          *
@@ -285,6 +291,7 @@
 
         /**
          * remove an observer for a property
+         * @memberof Crates
          * @param  {ObserverIdentity} observerObject
          */
         Crate.prototype.removeObserver = function(observerObject) {
@@ -310,20 +317,36 @@
     /**
      * Behavior factory the creates a polymer style behavior that can be
      * used inside store element in polymer ^1.0
-     * @class @static
+     * @inner
      */
     var BehaviorCreator = (function() {
+        /**
+         * @typedef {Object} CrateBehavior
+         */
+
         return {
 
             /**
              * creates a behavior
+             * @memberof BehaviorCreator
              * @param  {Crate} storage
              * @param  {Object} properties
              * @return {Object}
              */
             create: function(storage, properties) {
                 var behavior = {
+                    /**
+                     * behavior observers
+                     * @memberof CrateBehavior
+                     * @type {Array}
+                     */
                     observers: [],
+                    /**
+                     * polymer style property definitions that will be used
+                     * as shared store variables
+                     * @memberof CrateBehavior
+                     * @type {Object}
+                     */
                     properties: properties
                 };
 
@@ -337,15 +360,31 @@
 
             /**
              * Creates setter and getter proxy methods to the crate store instance
+             * @memberof BehaviorCreator
              * @param  {Object} behavior
              */
             createStoreSetterAndGetter: function(behavior) {
+                /**
+                 * sets a property of the store that will
+                 * then propagate to other components that listen for changes
+                 * @memberof CrateBehavior
+                 * @function setStoreValue
+                 * @param {String} prop
+                 * @param {mixed} value
+                 */
                 behavior.setStoreValue = function(prop, value) {
                     this._notifyStore = false;
                     this._crateStore.set(prop, value);
                     this._notifyStore = true;
                 };
 
+                /**
+                 * gets the value of a stored property directly from the store
+                 * @memberof CrateBehavior
+                 * @function getStoreValue
+                 * @param  {String} prop
+                 * @return {mixed}
+                 */
                 behavior.getStoreValue = function(prop) {
                     return this._crateStore.get(prop);
                 };
@@ -353,6 +392,7 @@
 
             /**
              * Constructs a observer method
+             * @memberof BehaviorCreator
              * @param  {String} propName
              * @param  {Function} propType
              * @return {Object}
@@ -377,10 +417,20 @@
 
             /**
              * Creates an observer for all the store properties
+             * @memberof BehaviorCreator
              * @param  {Object} behavior
              * @param  {Object} properties
              */
             createPropertieObservers: function(behavior, properties) {
+                /**
+                 * Parses the observed value and returns a value that is
+                 * ready to be assigned to a store property
+                 * @memberof CrateBehavior
+                 * @function _parseObserverValue
+                 * @protected
+                 * @param  {mixed} value [description]
+                 * @return {mixed}
+                 */
                 behavior._parseObserverValue = function(value) {
                     if(
                         typeof(value) === 'object' &&
@@ -425,11 +475,21 @@
             /**
              * creates the attached lifecycle method used by polymer and creates
              * crate observers that watch for changes inside the store
+             * @memberof BehaviorCreator
              * @param  {Object} behavior
              * @param  {Crate} storage
              * @param  {Object} properties
              */
             createAttachedMethod: function(behavior, storage, properties) {
+                /**
+                 * Sets a variable from the store by either using
+                 * the private setter or the setter for the polymer property
+                 * @protected
+                 * @memberof CrateBehavior
+                 * @function _setObseverValue
+                 * @param {String} key
+                 * @param {mixed} value
+                 */
                 behavior._setObseverValue = function(key, value) {
                     var privateSetter = '_set' + key.charAt(0).toUpperCase() + key.slice(1);
 
@@ -443,10 +503,42 @@
                     this._notifyObserver = true;
                 };
 
+                /**
+                 * Sets reference to the crate instance being used
+                 * and defines all the needed store observers
+                 * @memberof CrateBehavior
+                 * @function attached
+                 */
                 behavior.attached = function() {
+                    /**
+                     * Instance to the crate instace
+                     * @memberof CrateBehavior
+                     * @name _crateStore
+                     * @type {Crates.Crate}
+                     */
                     this._crateStore = storage;
+                    /**
+                     * list of all generated observers used for unlinking
+                     * when the instance is detached
+                     * @memberof CrateBehavior
+                     * @name _crateStoreObservers
+                     * @protected
+                     * @type {Array<ObserverIdentity>}
+                     */
                     this._crateStoreObservers = [];
+                    /**
+                     * Block observer notification for the current instance
+                     * @memberof CrateBehavior
+                     * @name _notifyObserver
+                     * @type {Boolean}
+                     */
                     this._notifyObserver = true;
+                    /**
+                     * Block store notification for the current instance
+                     * @memberof CrateBehavior
+                     * @name _notifyStore
+                     * @type {Boolean}
+                     */
                     this._notifyStore = true;
 
                     for(var key in properties) {
@@ -470,9 +562,16 @@
             /**
              * creates the detached lifecycle method used by polymer that
              * removes all the observers created in attached
+             * @memberof BehaviorCreator
              * @param  {Object} behavior
              */
             createDetachedMethod: function(behavior) {
+                /**
+                 * Detached method on which we need to clear all autogenerated
+                 * observers
+                 * @memberof CrateBehavior
+                 * @name detached
+                 */
                 behavior.detached = function() {
                     for(var i=0, length = this._crateStoreObservers.length; i < length; i++) {
                         this._crateStore.removeObserver(this._crateStoreObservers[i]);
@@ -507,6 +606,7 @@
 
         /**
          * creates a Crate instance
+         * @memberof Crates
          * @param  {Object} payload
          * @return {Crate}
          */
@@ -516,8 +616,9 @@
 
         /**
          * creates a polymer style behavior
+         * @memberof Crates
          * @param  {Object} properties
-         * @return {Object}
+         * @return {CrateBehavior}
          */
         createBehavior: function(properties) {
             var storageMap = {};
