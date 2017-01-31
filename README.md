@@ -1,3 +1,130 @@
+# Crates.js
+
+CratesJS is a shared store libriary that has the capabilities of creating
+a polymer 1.0 style behavior that can leverege the two-way binding between
+the store elements and the elements that he is used in. This library is a way
+to efficiently communicate between different parts of the application without
+using untracable pub-sub signals.
+## Installing
+
+## Examples
+### Creating a store component
+```html
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../crates.include.html">
+
+<dom-module id="todo-store">
+    <script>
+        (function() {
+            'use strict';
+
+            var TodoStoreBehavior = Polymer.Crates.createBehavior({
+                todos: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                }
+            });
+
+            Polymer({
+                is: "todo-store",
+
+                behaviors: [
+                    TodoStoreBehavior
+                ]
+            });
+        }());
+    </script>
+</dom-module>
+```
+### Using the store component in other custom elements
+#### TODO input
+```html
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="./todo-store.html">
+<dom-module id="todo-input">
+    <template>
+        <style>
+            :host {
+                display: inline-block;
+            }
+        </style>
+
+        <input type="text" on-change="addTodo">
+
+        <todo-store id="todoStore" todos=""></todo-store>
+    </template>
+
+    <script>
+        Polymer({
+            is: "todo-input",
+            properties: {
+                todos: Array
+            },
+
+            addTodo: function(e) {
+                this.push('todos', e.target.value);
+                this.$.todoStore.setStoreValue('todos', this.todos);
+                e.target.value = '';
+            },
+
+        });
+    </script>
+</dom-module>
+```
+
+#### TODO list
+```html
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="./todo-store.html">
+<dom-module id="todo-list">
+    <template>
+        <style>
+            :host {
+                display: inline-block;
+            }
+        </style>
+        <table>
+            <template is="dom-repeat" items="[[todos]]">
+                <tr>
+                    <td>
+                        [[item]]
+                    </td>
+                    <td>
+                        <button on-tap="deleteItem" id="[[index]]">X</button>
+                    </td>
+                </tr>
+            </template>
+        </table>
+
+        <todo-store id="todoStore" todos=""></todo-store>
+    </template>
+
+    <script>
+        Polymer({
+            is: "todo-list",
+            properties: {
+                todos: Array
+            },
+
+            deleteItem: function(e) {
+                var button = e.target;
+                var index = parseInt(button.id);
+                this.splice('todos', index, 1);
+                var todos = this.todos;
+
+                this.notifyPath('todos', []);
+                this.notifyPath('todos', todos);
+            }
+        });
+    </script>
+</dom-module>
+
+```
+
+## API Docs
+
 ## Objects
 
 <dl>
@@ -18,9 +145,6 @@
 
 ## Crates : <code>object</code>
 **Kind**: global namespace  
-**License**: MITCratesJS is a shared store libriary that has the capabilities of creatinga polymer 1.0 style behavior that can leverege the two-way binding betweenthe store elements and the elements that he is used in. This library is a wayto efficiently communicate between different parts of the application withoutusing untracable pub-sub signals.  
-**Example**  
-### Creating a store component```html<link rel="import" href="../../polymer/polymer.html"><link rel="import" href="../crates.include.html"><dom-module id="todo-store">    <script>        (function() {            'use strict';            var TodoStoreBehavior = Polymer.Crates.createBehavior({                todos: {                    type: Array,                    value: function() {                        return [];                    }                }            });            Polymer({                is: "todo-store",                behaviors: [                    TodoStoreBehavior                ]            });        }());    </script></dom-module>```### Using the store component in other custom elements#### TODO input```html<link rel="import" href="../../polymer/polymer.html"><link rel="import" href="./todo-store.html"><dom-module id="todo-input">    <template>        <style>            :host {                display: inline-block;            }        </style>        <input type="text" on-change="addTodo">        <todo-store id="todoStore" todos="{{todos}}"></todo-store>    </template>    <script>        Polymer({            is: "todo-input",            properties: {                todos: Array            },            addTodo: function(e) {                this.push('todos', e.target.value);                this.$.todoStore.setStoreValue('todos', this.todos);                e.target.value = '';            },        });    </script></dom-module>```#### TODO list```html<link rel="import" href="../../polymer/polymer.html"><link rel="import" href="./todo-store.html"><dom-module id="todo-list">    <template>        <style>            :host {                display: inline-block;            }        </style>        <table>            <template is="dom-repeat" items="[[todos]]">                <tr>                    <td>                        [[item]]                    </td>                    <td>                        <button on-tap="deleteItem" id="[[index]]">X</button>                    </td>                </tr>            </template>        </table>        <todo-store id="todoStore" todos="{{todos}}"></todo-store>    </template>    <script>        Polymer({            is: "todo-list",            properties: {                todos: Array            },            deleteItem: function(e) {                var button = e.target;                var index = parseInt(button.id);                this.splice('todos', index, 1);                var todos = this.todos;                this.notifyPath('todos', []);                this.notifyPath('todos', todos);            }        });    </script></dom-module>```
 
 * [Crates](#Crates) : <code>object</code>
     * [.Crate](#Crates.Crate)
@@ -163,12 +287,12 @@ creates a polymer style behavior
     * [._crateStoreObservers](#CrateBehavior._crateStoreObservers) : <code>[Array.&lt;ObserverIdentity&gt;](#ObserverIdentity)</code>
     * [._notifyObserver](#CrateBehavior._notifyObserver) : <code>Boolean</code>
     * [._notifyStore](#CrateBehavior._notifyStore) : <code>Boolean</code>
-    * [.detached](#CrateBehavior.detached)
     * [.setStoreValue(prop, value)](#CrateBehavior.setStoreValue)
     * [.getStoreValue(prop)](#CrateBehavior.getStoreValue) ⇒ <code>mixed</code>
     * [._parseObserverValue(value)](#CrateBehavior._parseObserverValue) ⇒ <code>mixed</code>
     * [._setObseverValue(key, value)](#CrateBehavior._setObseverValue)
     * [.attached()](#CrateBehavior.attached)
+    * [.detached()](#CrateBehavior.detached)
 
 <a name="CrateBehavior.observers"></a>
 
@@ -205,12 +329,6 @@ Block observer notification for the current instance
 
 ### CrateBehavior._notifyStore : <code>Boolean</code>
 Block store notification for the current instance
-
-**Kind**: static property of <code>[CrateBehavior](#CrateBehavior)</code>  
-<a name="CrateBehavior.detached"></a>
-
-### CrateBehavior.detached
-Detached method on which we need to clear all autogeneratedobservers
 
 **Kind**: static property of <code>[CrateBehavior](#CrateBehavior)</code>  
 <a name="CrateBehavior.setStoreValue"></a>
@@ -267,3 +385,51 @@ Sets a variable from the store by either usingthe private setter or the setter 
 Sets reference to the crate instance being usedand defines all the needed store observers
 
 **Kind**: static method of <code>[CrateBehavior](#CrateBehavior)</code>  
+<a name="CrateBehavior.detached"></a>
+
+### CrateBehavior.detached()
+Detached method on which we need to clear all autogeneratedobservers
+
+**Kind**: static method of <code>[CrateBehavior](#CrateBehavior)</code>  
+
+## License
+Copyright 2017 lexmihaylov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## Contributing
+
+When contributing to this repository, please first discuss the change you wish to make via issue,
+email, or any other method with the owners of this repository before making a change.
+
+### Pull Request Process
+
+1. Ensure any install or build dependencies are removed before the end of the layer when doing a
+   build.
+2. Use JSDoc standarts to document your code
+3. Update overview.hbs if needed
+3. Use [jsdoc2md](https://github.com/jsdoc2md/jsdoc-to-markdown) to generate the documentation
+```bash
+$ npm install -g jsdoc-to-markdown
+$ jsdoc2md -t overview.hbs crates.js > README.md
+```
+4. Increase the version numbers in any examples files and the README.md to the new version that this
+   Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/).
+5. You may merge the Pull Request in once you have the sign-off of two other developers, or if you
+   do not have permission to do that, you may request the second reviewer to merge it for you.
