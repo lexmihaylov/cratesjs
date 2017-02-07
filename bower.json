@@ -1,14 +1,14 @@
 {
   "name": "cratesjs",
-  "description": "CratesJS is a shared store libriary that has the capabilities of creating a polymer 1.0 style behavior that can leverege the two-way binding between the store elements and the elements that he is used in. This library is a way to efficiently communicate between different parts of the application without using untracable pub-sub signals.",
+  "description": "CratesJS is a shared store libriary that has the capabilities of creating a polymer 1.0 style behavior.",
   "main": "crates.js",
   "authors": [
     "Alexander Mihaylov"
   ],
   "keywords": [
-    "shared store"
+    "shared store",
     "Polymer",
-    "behavior"
+    "behavior",
     "web-components"
   ],
   "license": "MIT",
