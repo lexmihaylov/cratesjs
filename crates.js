@@ -15,30 +15,6 @@
 })(this, 'Crates', function() {
     'use strict';
 
-    if (typeof Object.assign != 'function') {
-        Object.assign = function(target, varArgs) { // .length of function is 2
-            if (target === null) { // TypeError if undefined or null
-                throw new TypeError('Cannot convert undefined or null to object');
-            }
-
-            var to = Object(target);
-
-            for (var index = 1; index < arguments.length; index++) {
-                var nextSource = arguments[index];
-
-                if (nextSource !== null) { // Skip over if undefined or null
-                    for (var nextKey in nextSource) {
-                        // Avoid bugs when hasOwnProperty is shadowed
-                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                            to[nextKey] = nextSource[nextKey];
-                        }
-                    }
-                }
-            }
-            return to;
-        };
-    }
-
     /**
      * gets or set a value in a map
      * @param  {Object} context
@@ -114,10 +90,10 @@
          * @return {mixed}
          */
         Crate.prototype.cloneComplexOrReturn = function(value) {
-            if(value instanceof Array) {
-                value = [].concat(value);
-            } else if(value instanceof Object) {
-                value = Object.assign({}, value);
+            if(value instanceof Object) {
+                value = JSON.parse(
+                    JSON.stringify(value)
+                );
             }
 
             return value;
@@ -307,21 +283,6 @@
                  * @return {mixed}
                  */
                 behavior._parseObserverValue = function(value) {
-                    if(
-                        typeof(value) === 'object' &&
-                        'base' in value
-                    ) {
-                        // this will be used whe we figure out how not to
-                        // duplicate data between components
-                        value = value.base;
-
-                        if(value instanceof Array) {
-                            return ([]).concat(value);
-                        } else {
-                            return Object.assign({}, value);
-                        }
-                    }
-
                     return value;
                 };
 
