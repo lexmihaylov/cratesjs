@@ -159,7 +159,7 @@ $ bower install cratesjs
         * [new Crate(payload)](#new_Crates.Crate_new)
     * [.Crate#set(path, value, [notify])](#Crates.Crate+set)
     * [.Crate#get(path)](#Crates.Crate+get) ⇒ <code>mixed</code>
-    * [.Crate#cloneComplexOrReturn(value)](#Crates.Crate+cloneComplexOrReturn) ⇒ <code>mixed</code>
+    * [.Crate#ensureImmutable(value)](#Crates.Crate+ensureImmutable) ⇒ <code>mixed</code>
     * [.Crate#dispatch(path, value)](#Crates.Crate+dispatch)
     * [.Crate#addObserver(path, handler)](#Crates.Crate+addObserver) ⇒ <code>[ObserverIdentity](#ObserverIdentity)</code>
     * [.Crate#removeObserver(observerObject)](#Crates.Crate+removeObserver)
@@ -204,9 +204,9 @@ get a property value from the store
 | --- | --- |
 | path | <code>String</code> | 
 
-<a name="Crates.Crate+cloneComplexOrReturn"></a>
+<a name="Crates.Crate+ensureImmutable"></a>
 
-### Crates.Crate#cloneComplexOrReturn(value) ⇒ <code>mixed</code>
+### Crates.Crate#ensureImmutable(value) ⇒ <code>mixed</code>
 creates new complex values (Object, Array)
 
 **Kind**: static method of <code>[Crates](#Crates)</code>  
