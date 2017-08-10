@@ -73,7 +73,7 @@ $ bower install cratesjs
 
             addTodo: function(e) {
                 this.push('todos', e.target.value);
-                this.$.todoStore.setStoreValue('todos', this.todos);
+                this.$.todoStore.notify('todos', this.todos);
                 e.target.value = '';
             },
 
@@ -120,10 +120,8 @@ $ bower install cratesjs
                 var button = e.target;
                 var index = parseInt(button.id);
                 this.splice('todos', index, 1);
-                var todos = this.todos;
-
-                this.notifyPath('todos', []);
-                this.notifyPath('todos', todos);
+                
+                this.$.todoStore.notify('todos', this.todos);
             }
         });
     </script>
@@ -210,6 +208,7 @@ get a property value from the store
 creates new complex values (Object, Array)
 
 **Kind**: static method of <code>[Crates](#Crates)</code>  
+**Note**: subobjects will not be clonedwhich means that it is possible the developer to change something by referencethere are two ways of creating true immutability:     1. clone the object recursively     2. use JSON.stringify/parse to create a deep clonenone of these seem efficient enough  
 
 | Param | Type |
 | --- | --- |
@@ -295,8 +294,8 @@ creates a polymer style behavior
     * [._crateStoreObservers](#CrateBehavior._crateStoreObservers) : <code>[Array.&lt;ObserverIdentity&gt;](#ObserverIdentity)</code>
     * [._notifyObserver](#CrateBehavior._notifyObserver) : <code>Boolean</code>
     * [._notifyStore](#CrateBehavior._notifyStore) : <code>Boolean</code>
-    * [.setStoreValue(prop, value)](#CrateBehavior.setStoreValue)
-    * [.getStoreValue(prop)](#CrateBehavior.getStoreValue) ⇒ <code>mixed</code>
+    * [.set(prop, value)](#CrateBehavior.set)
+    * [.get(prop)](#CrateBehavior.get) ⇒ <code>mixed</code>
     * [._parseObserverValue(value)](#CrateBehavior._parseObserverValue) ⇒ <code>mixed</code>
     * [._setObseverValue(key, value)](#CrateBehavior._setObseverValue)
     * [.attached()](#CrateBehavior.attached)
@@ -339,9 +338,9 @@ Block observer notification for the current instance
 Block store notification for the current instance
 
 **Kind**: static property of <code>[CrateBehavior](#CrateBehavior)</code>  
-<a name="CrateBehavior.setStoreValue"></a>
+<a name="CrateBehavior.set"></a>
 
-### CrateBehavior.setStoreValue(prop, value)
+### CrateBehavior.set(prop, value)
 sets a property of the store that willthen propagate to other components that listen for changes
 
 **Kind**: static method of <code>[CrateBehavior](#CrateBehavior)</code>  
@@ -351,9 +350,9 @@ sets a property of the store that willthen propagate to other components that l
 | prop | <code>String</code> | 
 | value | <code>mixed</code> | 
 
-<a name="CrateBehavior.getStoreValue"></a>
+<a name="CrateBehavior.get"></a>
 
-### CrateBehavior.getStoreValue(prop) ⇒ <code>mixed</code>
+### CrateBehavior.get(prop) ⇒ <code>mixed</code>
 gets the value of a stored property directly from the store
 
 **Kind**: static method of <code>[CrateBehavior](#CrateBehavior)</code>  

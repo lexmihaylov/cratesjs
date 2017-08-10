@@ -1,4 +1,4 @@
-<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="./todo-store.html">
 <dom-module id="todo-list">
     <template>
@@ -29,15 +29,13 @@
             properties: {
                 todos: Array
             },
-
+            
             deleteItem: function(e) {
                 var button = e.target;
                 var index = parseInt(button.id);
                 this.splice('todos', index, 1);
-                var todos = this.todos;
-
-                this.notifyPath('todos', []);
-                this.notifyPath('todos', todos);
+                
+                this.$.todoStore.notify('todos', this.todos);
             }
         });
     </script>

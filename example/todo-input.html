@@ -1,4 +1,4 @@
-<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="./todo-store.html">
 <dom-module id="todo-input">
     <template>
@@ -22,9 +22,10 @@
 
             addTodo: function(e) {
                 this.push('todos', e.target.value);
-                this.$.todoStore.setStoreValue('todos', this.todos);
                 e.target.value = '';
-            },
+                
+                this.$.todoStore.notify('todos', this.todos);
+            }
 
         });
     </script>

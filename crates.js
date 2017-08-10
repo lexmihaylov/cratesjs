@@ -85,7 +85,7 @@
             if(notify === undefined || notify === null) {
                 notify = true;
             }
-
+            
             tracePath(
                 this._payload,
                 path,
@@ -109,6 +109,16 @@
 
         /**
          * creates new complex values (Object, Array)
+         * 
+         * @note
+         * subobjects will not be cloned
+         * which means that it is possible 
+         * the developer to change something by reference
+         * there are two ways of creating true immutability:
+         *      1. clone the object recursively
+         *      2. use JSON.stringify/parse to create a deep clone
+         * none of these seem efficient enough
+         * 
          * @memberof Crates
          * @param  {mixed} value
          * @return {mixed}
@@ -119,7 +129,7 @@
             } else if(value instanceof Object) {
                 value = Object.assign({}, value);
             }
-
+            
             return value;
         };
 
@@ -243,11 +253,12 @@
                  * sets a property of the store that will
                  * then propagate to other components that listen for changes
                  * @memberof CrateBehavior
-                 * @function setStoreValue
+                 * @function set
                  * @param {String} prop
                  * @param {mixed} value
                  */
-                behavior.setStoreValue = function(prop, value) {
+                behavior.notify = 
+                behavior.set = function(prop, value) {
                     this._notifyStore = false;
                     this._crateStore.set(prop, value);
                     this._notifyStore = true;
@@ -256,11 +267,11 @@
                 /**
                  * gets the value of a stored property directly from the store
                  * @memberof CrateBehavior
-                 * @function getStoreValue
+                 * @function get
                  * @param  {String} prop
                  * @return {mixed}
                  */
-                behavior.getStoreValue = function(prop) {
+                behavior.get = function(prop) {
                     return this._crateStore.get(prop);
                 };
             },

@@ -26,7 +26,7 @@ gulp.task('build-html', function() {
         pipe(rename('crates.html')).
         pipe(gulp.dest('./'));
 });
-console.log(path.join('node_modules', '.bin', 'jsdoc2md'));
+
 gulp.task('build-docs', shell.task([
     path.join('node_modules', '.bin', 'jsdoc2md') +
     ' -t '+

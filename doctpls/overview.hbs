@@ -73,7 +73,7 @@ $ bower install cratesjs
 
             addTodo: function(e) {
                 this.push('todos', e.target.value);
-                this.$.todoStore.setStoreValue('todos', this.todos);
+                this.$.todoStore.notify('todos', this.todos);
                 e.target.value = '';
             },
 
@@ -120,10 +120,8 @@ $ bower install cratesjs
                 var button = e.target;
                 var index = parseInt(button.id);
                 this.splice('todos', index, 1);
-                var todos = this.todos;
-
-                this.notifyPath('todos', []);
-                this.notifyPath('todos', todos);
+                
+                this.$.todoStore.notify('todos', this.todos);
             }
         });
     </script>
